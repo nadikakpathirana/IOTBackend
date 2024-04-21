@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOTBackend.API", "IOTBackend.API\IOTBackend.API.csproj", "{3D2784C1-B1D4-4214-8524-B7362C551131}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IOTBackend.API", "IOTBackend.API\IOTBackend.API.csproj", "{3D2784C1-B1D4-4214-8524-B7362C551131}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOTBackend.Domain", "IOTBackend.Domain\IOTBackend.Domain.csproj", "{1EB510BA-7EFD-4D08-876F-1790CCED28E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOTBackend.Infrastructure", "IOTBackend.Infrastructure\IOTBackend.Infrastructure.csproj", "{81EE8A7A-5E1A-4F2E-AF7C-1038811E53AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOTBackend.Application", "IOTBackend.Application\IOTBackend.Application.csproj", "{EF9FEF92-7D4A-46C9-A7B2-789FE4D65BF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOTBackend.Persistance", "IOTBackend.Persistance\IOTBackend.Persistance.csproj", "{1B7080DF-AFDE-46E5-97B3-B3F6887FEBF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{3D2784C1-B1D4-4214-8524-B7362C551131}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D2784C1-B1D4-4214-8524-B7362C551131}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D2784C1-B1D4-4214-8524-B7362C551131}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EB510BA-7EFD-4D08-876F-1790CCED28E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EB510BA-7EFD-4D08-876F-1790CCED28E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EB510BA-7EFD-4D08-876F-1790CCED28E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EB510BA-7EFD-4D08-876F-1790CCED28E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81EE8A7A-5E1A-4F2E-AF7C-1038811E53AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81EE8A7A-5E1A-4F2E-AF7C-1038811E53AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81EE8A7A-5E1A-4F2E-AF7C-1038811E53AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81EE8A7A-5E1A-4F2E-AF7C-1038811E53AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF9FEF92-7D4A-46C9-A7B2-789FE4D65BF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF9FEF92-7D4A-46C9-A7B2-789FE4D65BF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF9FEF92-7D4A-46C9-A7B2-789FE4D65BF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF9FEF92-7D4A-46C9-A7B2-789FE4D65BF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B7080DF-AFDE-46E5-97B3-B3F6887FEBF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B7080DF-AFDE-46E5-97B3-B3F6887FEBF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B7080DF-AFDE-46E5-97B3-B3F6887FEBF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B7080DF-AFDE-46E5-97B3-B3F6887FEBF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
