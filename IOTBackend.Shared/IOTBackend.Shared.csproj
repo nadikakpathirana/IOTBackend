@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\IOTBackend.Shared\IOTBackend.Shared.csproj" />
-  </ItemGroup>
-
 </Project>

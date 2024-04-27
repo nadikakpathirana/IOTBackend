@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IOTBackend.Domain\IOTBackend.Domain.csproj" />
+    <ProjectReference Include="..\IOTBackend.Infrastructure\IOTBackend.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
