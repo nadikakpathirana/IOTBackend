@@ -1,4 +1,5 @@
 ﻿using IOTBackend.Domain.DbEntities;
+using IOTBackend.Shared.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,10 @@ namespace IOTBackend.Application.Interfaces
 {
     public interface IUserService
     {
-        IEnumerable<User> GetAllUsers();
+        Task<List<User>> GetAllUsersAsync();
+        Task<User> GetUserAsync(Guid userId);
+        Task<CommonActionResult> AddUserAsync(User user);
+        Task<CommonActionResult> UpdateUserAsync(Guid userId, User user);
+        Task<CommonActionResult> DeleteUserAsync(Guid userId);
     }
 }

@@ -23,8 +23,8 @@ namespace IOTBackend.Infrastructure.Management
             builder.Host = "localhost";
             builder.Port = 5432;
             builder.Database = "IOTBackend";
-            builder.Username = "admin";
-            builder.Password = "adminadmin";
+            builder.Username = "postgres";
+            builder.Password = "postgres";
 
             if (typeof(TContext) == typeof(AppDbContext))
             {

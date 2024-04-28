@@ -15,7 +15,16 @@ namespace IOTBackend.Persistance
         public static IServiceCollection AddPersistanceServices(this IServiceCollection services,  IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
-                    options.UseNpgsql(configuration.GetConnectionString("AppDbConnection")));
+            {
+                options.UseNpgsql(
+                        configuration.GetConnectionString("AppDbConnection"), 
+                        b => b.MigrationsAssembly("IOTBackend.API")
+                    );
+
+            });
+
+
+                    
 
             return services;
         }
