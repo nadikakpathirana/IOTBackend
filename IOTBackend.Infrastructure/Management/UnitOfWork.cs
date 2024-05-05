@@ -1,12 +1,5 @@
 ﻿using IOTBackend.Infrastructure.Interfaces;
-using IOTBackend.Persistance;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOTBackend.Infrastructure.Management
 {
@@ -19,6 +12,16 @@ namespace IOTBackend.Infrastructure.Management
         public UnitOfWork()
         {
             _dbContext = DbContextFactory.CreateDbContext<TContext>();
+            try
+            {
+                _dbContext.Database.OpenConnection();
+                _dbContext.Database.CloseConnection();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in UnitOfWork");
+                Console.WriteLine(ex);
+            }
         }
 
         public IRepository<TEntity> GetRepository<TEntity>() where TEntity : class

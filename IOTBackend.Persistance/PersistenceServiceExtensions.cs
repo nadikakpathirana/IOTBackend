@@ -16,16 +16,22 @@ namespace IOTBackend.Persistance
         {
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseNpgsql(
-                        configuration.GetConnectionString("AppDbConnection"), 
-                        b => b.MigrationsAssembly("IOTBackend.API")
-                    );
+                {
+                    try
+                    {
+                        options.UseNpgsql(
+                            configuration.GetConnectionString("AppDbConnection"),
+                            b => b.MigrationsAssembly("IOTBackend.API")
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error while connecting to DB");
+                        Console.WriteLine(ex);
+                    }
+                }
 
             });
-
-
-                    
-
             return services;
         }
     }

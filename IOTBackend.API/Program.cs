@@ -32,7 +32,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+// app.UseAuthorization();
+
+Console.WriteLine(builder.Configuration.GetConnectionString("AppDbConnection"));
 
 app.MapControllers();
 
