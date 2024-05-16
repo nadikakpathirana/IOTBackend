@@ -7,4 +7,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Fleck" Version="1.2.0" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="6.8.2.4717">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IOTBackend.Domain\IOTBackend.Domain.csproj" />
+    <ProjectReference Include="..\IOTBackend.Infrastructure\IOTBackend.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
