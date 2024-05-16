@@ -11,5 +11,7 @@ namespace IOTBackend.Domain.DbEntities.BaseEntities
     {
         [Key]
         public Guid Id { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

@@ -67,6 +67,10 @@ namespace IOTBackend.Infrastructure.Management
             return this._dbSet.AsNoTracking().Where(predicate);
         }
 
+        public async Task<List<T>> FindByAsync(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate).ToList();
+        }
 
         public IQueryable<T> GetAll()
         {

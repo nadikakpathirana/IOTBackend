@@ -8,8 +8,8 @@ namespace IOTBackend.Shared.Enums
 {
     public enum UserType
     {
-        Admin,
-        Regular,
-        Guest
+        Guest = 0,
+        Regular = 1,
+        Admin = 2,
     }
 }
