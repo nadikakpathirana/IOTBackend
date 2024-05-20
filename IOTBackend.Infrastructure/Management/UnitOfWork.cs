@@ -1,17 +1,20 @@
 ﻿using IOTBackend.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace IOTBackend.Infrastructure.Management
 {
     public sealed class UnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbContext, IDisposable, new()
     {
         private readonly TContext _dbContext;
+        private readonly IConfiguration _configuration;
 
         private Dictionary<Type, object>? repositories;
 
-        public UnitOfWork()
+        public UnitOfWork(IConfiguration configuration)
         {
-            _dbContext = DbContextFactory.CreateDbContext<TContext>();
+            _configuration = configuration;
+            _dbContext = DbContextFactory.CreateDbContext<TContext>(_configuration.GetConnectionString("AppDbConnection"));
             try
             {
                 _dbContext.Database.OpenConnection();

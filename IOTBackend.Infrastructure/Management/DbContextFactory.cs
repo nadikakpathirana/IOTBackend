@@ -13,22 +13,11 @@ namespace IOTBackend.Infrastructure.Management
 {
     public static class DbContextFactory
     {
-        
-
-        public static TContext CreateDbContext<TContext>() where TContext : DbContext, new()
+        public static TContext CreateDbContext<TContext>(string connectionString) where TContext : DbContext, new()
         {
-            var builder = new NpgsqlConnectionStringBuilder();
-
-            //Todo: remove them 
-            builder.Host = "localhost";
-            builder.Port = 5432;
-            builder.Database = "IOTBackend";
-            builder.Username = "postgres";
-            builder.Password = "postgres";
-
             if (typeof(TContext) == typeof(AppDbContext))
             {
-                return (TContext)Activator.CreateInstance(typeof(TContext), new object[] { builder.ConnectionString });
+                return (TContext)Activator.CreateInstance(typeof(TContext), new object[] { connectionString });
             }
             else
             {
