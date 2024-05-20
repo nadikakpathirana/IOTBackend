@@ -12,7 +12,7 @@ namespace IOTBackend.Persistance
 {
     public static class PersistenceServiceExtensions
     {
-        public static IServiceCollection AddPersistanceServices(this IServiceCollection services,  IConfiguration configuration)
+        public static void AddPersistanceServices(this IServiceCollection services,  IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options =>
             {
@@ -32,7 +32,6 @@ namespace IOTBackend.Persistance
                 }
 
             });
-            return services;
         }
     }
 }

@@ -7,11 +7,16 @@ using System.Threading.Tasks;
 
 namespace IOTBackend.Shared.Responses
 {
-    public class CommonActionResult
+    public class CommonActionResult<TEntity>
     {
         public ActionStatus Status { get; set; }
-        public string Message { get; set; }
-        public CommonErrorResultDto ErrorResult { get; set; }
-        public List<string> ErrorMessages { get; set; }
+        public TEntity? Entity { get; set; }
+        public CommonErrorResultDto? ErrorResult { get; set; }
+    }
+
+    public class CommonErrorResultDto
+    {
+        public Exception? exception { get; set; }
+        public string customErrorCode { get; set; } = string.Empty;
     }
 }

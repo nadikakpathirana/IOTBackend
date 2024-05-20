@@ -25,5 +25,10 @@ namespace IOTBackend.Persistance
         }
 
         public DbSet<User>? Users { get; set; }
+        public DbSet<APIKey>? APIKeys { get; set; }
+        public DbSet<ConnectionLine>? ConnectionLines { get; set; }
+        public DbSet<Device>? Devices { get; set; }
+        public DbSet<Project>? Projects { get; set; }
+
     }
 }

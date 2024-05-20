@@ -34,11 +34,11 @@ namespace IOTBackend.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<ApiRequestResult<User>>> GetUser(Guid userId)
+        [HttpGet("{username}")]
+        public async Task<ActionResult<ApiRequestResult<User>>> GetUser(string username)
         {
 
-            var user = await _userService.GetUserAsync(userId);
+            var user = await _userService.GetUserAsync(username);
 
             if (user == null)
             {
@@ -62,7 +62,6 @@ namespace IOTBackend.API.Controllers
         [HttpPost]
         public async Task<ActionResult<ApiRequestResult<User>>> AddUser(User user)
         {
-            user.Id = Guid.NewGuid();
 
             var result = await _userService.AddUserAsync(user);
 
@@ -70,6 +69,7 @@ namespace IOTBackend.API.Controllers
             {
                 var errorResponse = new ApiRequestResult<User>
                 {
+                    Status = false,
                     Message = "Failed to add user"
                 };
                 return BadRequest(errorResponse);
@@ -82,7 +82,7 @@ namespace IOTBackend.API.Controllers
                 Data = user
             };
 
-            return Created($"api/users/{user.Id}", response);
+            return Created($"GetUser", response);
         }
 
         [HttpPut("{userId}")]
@@ -94,6 +94,7 @@ namespace IOTBackend.API.Controllers
             {
                 var errorResponse = new ApiRequestResult<User>
                 {
+                    Status = false,
                     Message = "Failed to update user"
                 };
                 return BadRequest(errorResponse);
@@ -118,6 +119,7 @@ namespace IOTBackend.API.Controllers
             {
                 var errorResponse = new ApiRequestResult<User>
                 {
+                    Status = false,
                     Message = "Failed to delete user"
                 };
                 return BadRequest(errorResponse);
