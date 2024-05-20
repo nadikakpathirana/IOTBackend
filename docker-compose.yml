@@ -13,7 +13,7 @@ services:
       - migration
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__AppDbConnection="Server=db;Port=5432;Database=IOTBackend;Username=postgres;Password=postgres"
+      - ConnectionStrings__AppDbConnection=Host=db;Port=5432;Database=IOTBackend;Username=postgres;Password=postgres
 
   db:
     image: postgres:14-alpine
@@ -35,4 +35,4 @@ services:
       - db
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__AppDbConnection="Server=db;Port=5432;Database=IOTBackend;Username=postgres;Password=postgres"
+      - ConnectionStrings__AppDbConnection=Host=db;Port=5432;Database=IOTBackend;Username=postgres;Password=postgres
