@@ -40,8 +40,8 @@ namespace IOTBackend.Application.Services
             var result = await projectRepository.AddAsync(project);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = project;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 
@@ -63,8 +63,8 @@ namespace IOTBackend.Application.Services
             var result = projectRepository.Update(existingProject);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingProject;
+            response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 

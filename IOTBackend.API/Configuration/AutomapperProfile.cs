@@ -9,6 +9,11 @@ namespace IOTBackend.API.Configuration
         public AutomapperProfile()
         {
             CreateMap<UserRegisterDto, User>();
+            
+            CreateMap<DeviceUpdateDto, Device>();
+            
+            CreateMap<APIKeyAddDto, APIKey>();
+            CreateMap<APIKeyUpdateDto, APIKey>();
         }
         
     }

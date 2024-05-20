@@ -1,4 +1,5 @@
-﻿using IOTBackend.Application.Interfaces;
+﻿using AutoMapper;
+using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
 using IOTBackend.Shared.Enums;
 using IOTBackend.Shared.Responses;
@@ -7,18 +8,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace IOTBackend.API.Controllers
 {
     [ApiController]
-    [Route("api/devices")]
+    [Route("api/devices/")]
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceService _deviceService;
+        private readonly IMapper _mapper;
 
-        public DeviceController(IDeviceService deviceService)
+        public DeviceController(IDeviceService deviceService, IMapper mapper)
         {
             _deviceService = deviceService;
+            _mapper = mapper;
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<List<Device>>> GetDevicesOfUser(Guid userId)
+        public async Task<ActionResult<List<Device>>> GetByUser(Guid userId)
         {
             var devices = await _deviceService.GetDevicesOfUserAsync(userId);
 
@@ -33,7 +36,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpGet("{deviceId}")]
-        public async Task<ActionResult<ApiRequestResult<Device>>> GetDevice(Guid deviceId)
+        public async Task<ActionResult<ApiRequestResult<Device>>> Get(Guid deviceId)
         {
             var result = await _deviceService.GetDeviceAsync(deviceId);
 
@@ -58,7 +61,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiRequestResult<Device>>> AddDevice(Device device)
+        public async Task<ActionResult<ApiRequestResult<Device>>> Add(Device device)
         {
             var result = await _deviceService.AddDeviceAsync(device);
 
@@ -76,17 +79,18 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Device added successfully",
-                Data = device
+                Data = result.Entity
             };
 
             return Created($"GetDevice/{result.Entity.Id}", response);
         }
 
-        [HttpPut("{deviceId}")]
-        public async Task<ActionResult<ApiRequestResult<Device>>> UpdateDevice(Guid deviceId, Device device)
+        [HttpPatch("{deviceId}")]
+        public async Task<ActionResult<ApiRequestResult<Device>>> Update(Guid deviceId, DeviceUpdateDto deviceUpdateDto)
         {
-            device.Id = deviceId;
-            var result = await _deviceService.UpdateDeviceAsync(device);
+            var updatedDevice = _mapper.Map<Device>(deviceUpdateDto);
+            updatedDevice.Id = deviceId;
+            var result = await _deviceService.UpdateDeviceAsync(updatedDevice);
 
             if (result.Status == ActionStatus.NotFound)
             {
@@ -112,14 +116,14 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Device updated successfully",
-                Data = device
+                Data = result.Entity
             };
 
             return Ok(response);
         }
 
         [HttpDelete("{deviceId}")]
-        public async Task<ActionResult<ApiRequestResult<Device>>> DeleteDevice(Guid deviceId)
+        public async Task<ActionResult<ApiRequestResult<Device>>> Delete(Guid deviceId)
         {
             var result = await _deviceService.DeleteDeviceAsync(deviceId);
 

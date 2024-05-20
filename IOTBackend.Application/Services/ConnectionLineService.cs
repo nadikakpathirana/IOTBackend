@@ -41,8 +41,8 @@ namespace IOTBackend.Application.Services
             var result = await connectionLineRepository.AddAsync(connectionLine);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = connectionLine;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
 
             return response;
         }
@@ -70,8 +70,8 @@ namespace IOTBackend.Application.Services
             var result = connectionLineRepository.Update(existingConnectionLine);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingConnectionLine;
+            response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
 
             return response;
         }

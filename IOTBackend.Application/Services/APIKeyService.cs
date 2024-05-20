@@ -18,10 +18,22 @@ namespace IOTBackend.Application.Services
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<APIKey> GetKeyOfAUser(Guid userId)
+        public async Task<APIKey?> GetKeyOfAUser(Guid userId)
         {
             var apiKeyRepository = _unitOfWork.GetRepository<APIKey>();
             var apiKey = await apiKeyRepository.FindByAsync(x => x.UserId == userId);
+            if (apiKey.Count > 0)
+            {
+                apiKey[0] = await IncludeOwner(apiKey[0]);
+                return apiKey[0];
+            }
+            return null;
+        }
+        
+        public async Task<APIKey> GetKey(Guid keyId)
+        {
+            var apiKeyRepository = _unitOfWork.GetRepository<APIKey>();
+            var apiKey = await apiKeyRepository.FindByAsync(x => x.Id == keyId);
             if (apiKey.Count > 0)
             {
                 apiKey[0] = await IncludeOwner(apiKey[0]);
@@ -35,11 +47,12 @@ namespace IOTBackend.Application.Services
             var apiKeyRepository = _unitOfWork.GetRepository<APIKey>();
 
             key.Id = new Guid();
+            key.Created = DateTime.UtcNow;
             var result = await apiKeyRepository.AddAsync(key);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = key;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
 
             return response;
         }
@@ -61,8 +74,8 @@ namespace IOTBackend.Application.Services
             var result = apiKeyRepository.Update(existingKey);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingKey;
+            response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
 
             return response;
         }

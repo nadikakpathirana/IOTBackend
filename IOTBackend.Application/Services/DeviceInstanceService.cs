@@ -39,8 +39,8 @@ namespace IOTBackend.Application.Services
             var result = await deviceInstanceRepository.AddAsync(deviceInstance);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = deviceInstance;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 
@@ -63,8 +63,8 @@ namespace IOTBackend.Application.Services
             var result = deviceInstanceRepository.Update(existingDeviceInstance);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingDeviceInstance;
+            response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 

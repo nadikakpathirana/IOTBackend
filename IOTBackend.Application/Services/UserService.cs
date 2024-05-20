@@ -58,10 +58,10 @@ namespace IOTBackend.Application.Services
             var result = await userRepository.AddAsync(user);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
 
             return response;
-            
         }
 
         public async Task<CommonActionResult<User>> UpdateUserAsync(Guid userId, User user)
@@ -83,7 +83,7 @@ namespace IOTBackend.Application.Services
             {
                 _unitOfWork.Commit();
 
-                response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+                response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
             }
             catch (Exception ex)
             {
@@ -103,8 +103,8 @@ namespace IOTBackend.Application.Services
                     };
                 }
             }
-
-
+            response.Entity = result.Item2;
+            
             return await Task.FromResult(response);
         }
 

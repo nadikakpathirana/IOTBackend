@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
@@ -9,18 +10,20 @@ using IOTBackend.Shared.Responses;
 namespace IOTBackend.API.Controllers
 {
     [ApiController]
-    [Route("api/apikeys")]
+    [Route("api/apikeys/")]
     public class APIKeyController : ControllerBase
     {
         private readonly IAPIKeyService _apiKeyService;
+        private readonly IMapper _mapper;
 
-        public APIKeyController(IAPIKeyService apiKeyService)
+        public APIKeyController(IAPIKeyService apiKeyService, IMapper mapper)
         {
             _apiKeyService = apiKeyService;
+            _mapper = mapper;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<ApiRequestResult<APIKey>>> GetKey(Guid userId)
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<ApiRequestResult<APIKey>>> GetByUser(Guid userId)
         {
             var apiKey = await _apiKeyService.GetKeyOfAUser(userId);
 
@@ -42,11 +45,36 @@ namespace IOTBackend.API.Controllers
 
             return Ok(response);
         }
+        
+        [HttpGet("{keyId}")]
+        public async Task<ActionResult<ApiRequestResult<APIKey>>> Get(Guid keyId)
+        {
+            var apiKey = await _apiKeyService.GetKeyOfAUser(keyId);
+
+            if (apiKey == null)
+            {
+                var errorResponse = new ApiRequestResult<APIKey>
+                {
+                    Message = "API Key not found"
+                };
+                return NotFound(errorResponse);
+            }
+
+            var response = new ApiRequestResult<APIKey>
+            {
+                Status = true,
+                Message = "API Key fetched successfully",
+                Data = apiKey
+            };
+
+            return Ok(response);
+        }
 
         [HttpPost]
-        public async Task<ActionResult<ApiRequestResult<APIKey>>> CreateKey(APIKey key)
+        public async Task<ActionResult<ApiRequestResult<APIKey>>> Create(APIKeyAddDto apiKeyAddDto)
         {
-            var result = await _apiKeyService.CreateKey(key);
+            var newKey = _mapper.Map<APIKey>(apiKeyAddDto);
+            var result = await _apiKeyService.CreateKey(newKey);
 
             if (result.Status == ActionStatus.Failed)
             {
@@ -65,14 +93,17 @@ namespace IOTBackend.API.Controllers
                 Data = result.Entity
             };
 
-            return Created($"GetKey/{result.Entity.Id}", response);
+            return Created($"GetKey", response);
         }
 
-        [HttpPut("{keyId}")]
-        public async Task<ActionResult<ApiRequestResult<APIKey>>> UpdateKey(Guid keyId, APIKey key)
+        [HttpPatch("{keyId}")]
+        public async Task<ActionResult<ApiRequestResult<APIKey>>> Update(Guid keyId, APIKeyUpdateDto key)
         {
-            key.Id = keyId; // Ensure the key ID matches the route parameter
-            var result = await _apiKeyService.UpdateKey(key);
+            key.Id = keyId;
+
+            var updatedApiKey = _mapper.Map<APIKey>(key);
+            updatedApiKey.Id = keyId;
+            var result = await _apiKeyService.UpdateKey(updatedApiKey);
 
             if (result.Status == ActionStatus.NotFound)
             {
@@ -105,7 +136,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpDelete("{keyId}")]
-        public async Task<ActionResult<ApiRequestResult<APIKey>>> DeleteKey(Guid keyId)
+        public async Task<ActionResult<ApiRequestResult<APIKey>>> Delete(Guid keyId)
         {
             var result = await _apiKeyService.DeleteKey(keyId);
 
@@ -133,7 +164,6 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "API Key deleted successfully",
-                Data = result.Entity
             };
 
             return Ok(response);
