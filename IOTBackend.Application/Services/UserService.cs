@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Security.Claims;
 using System.Text.Json;
+using AutoMapper;
+using IOTBackend.Domain.Dtos;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace IOTBackend.Application.Services
@@ -16,13 +19,14 @@ namespace IOTBackend.Application.Services
     public class UserService : IUserService
     {
         private readonly IUnitOfWork<AppDbContext> _unitOfWork;
-
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork<AppDbContext> unitOfWork, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUnitOfWork<AppDbContext> unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public async Task<List<User>> GetAllUsersAsync()
@@ -34,11 +38,16 @@ namespace IOTBackend.Application.Services
             return await Task.FromResult(data);
         }
 
-        public async Task<User> GetUserAsync(string userName)
+        public async Task<User?> GetUserAsync(string username)
         {
             var userRepository = _unitOfWork.GetRepository<User>();
-            var entity = await userRepository.FindByAsync(u => u.Username == userName);
-            return await Task.FromResult(entity[0]);
+            var entity = await userRepository.FindByAsync(u => u.Username == username);
+
+            if (entity.IsNullOrEmpty())
+            {
+                return null;
+            }
+            return entity[0];
         }
 
         public async Task<CommonActionResult<User>> AddUserAsync(User user)
@@ -47,14 +56,8 @@ namespace IOTBackend.Application.Services
 
             var userRepository = _unitOfWork.GetRepository<User>();
 
-            response = CheckDuplicateUser(user, response);
-
-            if (response.Status == ActionStatus.Error)
-            {
-                return response;
-            }
-
             user.Id = new Guid();
+            user.Created = DateTime.UtcNow;
             var result = await userRepository.AddAsync(user);
             _unitOfWork.Commit();
 
@@ -64,20 +67,26 @@ namespace IOTBackend.Application.Services
             return response;
         }
 
-        public async Task<CommonActionResult<User>> UpdateUserAsync(Guid userId, User user)
+        public async Task<CommonActionResult<User>> UpdateUserAsync(Guid userId, UserUpdateDto user)
         {
             var response = new CommonActionResult<User>();
 
             var userRepository = _unitOfWork.GetRepository<User>();
 
-            response = IsExists(user.Id, response);
+            var existingUser = await userRepository.GetAsync(userId);
 
-            if (response.Status == ActionStatus.Failed)
+            if (existingUser == null)
             {
-                return await Task.FromResult(response);
+                response.Status = ActionStatus.NotFound;
+                return response;
             }
+            
+            var newUser = _mapper.Map<User>(user);
 
-            var result = userRepository.Update(user);
+            newUser.Id = existingUser.Id;
+            newUser.Created = existingUser.Created;
+            
+            var result = userRepository.Update(newUser);
 
             try
             {

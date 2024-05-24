@@ -1,5 +1,6 @@
 ﻿using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
+using IOTBackend.Domain.Dtos;
 using IOTBackend.Shared.Enums;
 using IOTBackend.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IOTBackend.API.Controllers
 {
     [ApiController]
-    [Route("api/projects")]
+    [Route("api/projects/")]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
@@ -16,8 +17,23 @@ namespace IOTBackend.API.Controllers
         {
             _projectService = projectService;
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<ApiRequestResult<List<Project>>>> GetAll()
+        {
+            var projects = await _projectService.GetAll();
 
-        [HttpGet("{userId}")]
+            var response = new ApiRequestResult<List<Project>>
+            {
+                Status = true,
+                Message = "Projects fetched successfully",
+                Data = projects
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet("user/{userId}")]
         public async Task<ActionResult<List<Project>>> GetAllProjectsOfUser(Guid userId)
         {
             var projects = await _projectService.GetAllProjectsOfUserAsync(userId);
@@ -37,7 +53,7 @@ namespace IOTBackend.API.Controllers
         {
             var project = await _projectService.GetProjectAsync(projectId);
 
-            if (project == null || project.Count == 0)
+            if (project.Count == 0)
             {
                 var errorResponse = new ApiRequestResult<Project>
                 {
@@ -58,7 +74,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiRequestResult<Project>>> CreateProject(Project project)
+        public async Task<ActionResult<ApiRequestResult<Project>>> CreateProject(ProjectCreateDto project)
         {
             var result = await _projectService.CreateProjectAsync(project);
 
@@ -76,17 +92,16 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Project created successfully",
-                Data = project
+                Data = result.Entity
             };
 
-            return Created($"GetProject/{result.Entity.Id}", response);
+            return Created($"GetProject/{result?.Entity?.Id}", response);
         }
 
-        [HttpPut("{projectId}")]
-        public async Task<ActionResult<ApiRequestResult<Project>>> UpdateProject(Guid projectId, Project project)
+        [HttpPatch("{projectId}")]
+        public async Task<ActionResult<ApiRequestResult<Project>>> UpdateProject(Guid projectId, ProjectUpdateDto project)
         {
-            project.Id = projectId;
-            var result = await _projectService.UpdateProjectAsync(project);
+            var result = await _projectService.UpdateProjectAsync(projectId, project);
 
             if (result.Status == ActionStatus.NotFound)
             {
@@ -112,7 +127,7 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Project updated successfully",
-                Data = project
+                Data = result.Entity
             };
 
             return Ok(response);

@@ -1,5 +1,6 @@
 ﻿using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
+using IOTBackend.Domain.Dtos;
 using IOTBackend.Shared.Enums;
 using IOTBackend.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -16,8 +17,23 @@ namespace IOTBackend.API.Controllers
         {
             _deviceInstanceService = deviceInstanceService;
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<List<DeviceInstance>>> GetDeviceInstances()
+        {
+            var deviceInstances = await _deviceInstanceService.GetAll();
 
-        [HttpGet("{projectId}")]
+            var response = new ApiRequestResult<List<DeviceInstance>>
+            {
+                Status = true,
+                Message = "Device instances fetched successfully",
+                Data = deviceInstances
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet("project/{projectId}")]
         public async Task<ActionResult<List<DeviceInstance>>> GetDeviceInstances(Guid projectId)
         {
             var deviceInstances = await _deviceInstanceService.GetDeviceInstancesesAsync(projectId);
@@ -58,7 +74,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiRequestResult<DeviceInstance>>> AddDeviceInstance(DeviceInstance deviceInstance)
+        public async Task<ActionResult<ApiRequestResult<DeviceInstance>>> AddDeviceInstance(DeviceInstanceCreateDto deviceInstance)
         {
 
             var result = await _deviceInstanceService.AddDeviceInstanceAsync(deviceInstance);
@@ -77,16 +93,16 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Device instance added successfully",
-                Data = deviceInstance
+                Data = result.Entity
             };
 
             return Created($"GetDeviceInstance/{result.Entity.Id}", response);
         }
 
-        [HttpPut("{deviceInstanceId}")]
-        public async Task<ActionResult<ApiRequestResult<DeviceInstance>>> UpdateDeviceInstance(Guid deviceInstanceId, DeviceInstance deviceInstance)
+        [HttpPatch("{deviceInstanceId}")]
+        public async Task<ActionResult<ApiRequestResult<DeviceInstance>>> UpdateDeviceInstance(Guid deviceInstanceId, DeviceInstanceUpdateDto deviceInstance)
         {
-            var result = await _deviceInstanceService.UpdateDeviceInstanceAsync(deviceInstance);
+            var result = await _deviceInstanceService.UpdateDeviceInstanceAsync(deviceInstanceId, deviceInstance);
 
             if (result.Status == ActionStatus.NotFound)
             {
@@ -112,7 +128,7 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Device instance updated successfully",
-                Data = deviceInstance
+                Data = result.Entity
             };
 
             return Ok(response);

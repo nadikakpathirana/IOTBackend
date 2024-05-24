@@ -1,8 +1,8 @@
 ﻿using IOTBackend.Domain.DbEntities.BaseEntities;
 
-namespace IOTBackend.Domain.DbEntities
+namespace IOTBackend.Domain.Dtos
 {
-    public class APIKeyUpdateDto : ModelBase
+    public class ApiKeyUpdateDto : ModelBase
     {
         public string Name { get; set; }
         public Guid UserId { get; set; }

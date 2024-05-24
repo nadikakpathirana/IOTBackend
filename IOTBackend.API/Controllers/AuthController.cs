@@ -34,20 +34,30 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login(UserLoginDto userLoginDto)
+        public async Task<ActionResult<ApiRequestResult<User>>> Login(UserLoginDto userLoginDto)
         {
             var user = await _authService.Login(userLoginDto);
-
+            
             if (user == null)
             {
-                ModelState.AddModelError("CustomeError", "Invalid credentials");
-                return BadRequest(ModelState);
+                var errorResponse = new ApiRequestResult<User>
+                {
+                    Message = "Invalid credentials"
+                };
+                return NotFound(errorResponse);
             }
-
+            
             string token = _authService.GenerateToken(user);
             user.Token = token;
 
-            return Ok(user);
+            var response = new ApiRequestResult<User>
+            {
+                Status = true,
+                Message = "User logged in to the system successfully",
+                Data = user
+            };
+
+            return Ok(response);
         }
 
         [HttpGet, Authorize]

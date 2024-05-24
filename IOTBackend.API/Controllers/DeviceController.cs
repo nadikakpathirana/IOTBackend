@@ -12,12 +12,25 @@ namespace IOTBackend.API.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceService _deviceService;
-        private readonly IMapper _mapper;
 
-        public DeviceController(IDeviceService deviceService, IMapper mapper)
+        public DeviceController(IDeviceService deviceService)
         {
             _deviceService = deviceService;
-            _mapper = mapper;
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<List<Device>>> GetAll()
+        {
+            var devices = await _deviceService.GetAll();
+
+            var response = new ApiRequestResult<List<Device>>
+            {
+                Status = true,
+                Message = "Devices fetched successfully",
+                Data = devices
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("user/{userId}")]
@@ -82,15 +95,13 @@ namespace IOTBackend.API.Controllers
                 Data = result.Entity
             };
 
-            return Created($"GetDevice/{result.Entity.Id}", response);
+            return Created($"GetDevice/{result?.Entity?.Id}", response);
         }
 
         [HttpPatch("{deviceId}")]
         public async Task<ActionResult<ApiRequestResult<Device>>> Update(Guid deviceId, DeviceUpdateDto deviceUpdateDto)
         {
-            var updatedDevice = _mapper.Map<Device>(deviceUpdateDto);
-            updatedDevice.Id = deviceId;
-            var result = await _deviceService.UpdateDeviceAsync(updatedDevice);
+            var result = await _deviceService.UpdateDeviceAsync(deviceUpdateDto);
 
             if (result.Status == ActionStatus.NotFound)
             {

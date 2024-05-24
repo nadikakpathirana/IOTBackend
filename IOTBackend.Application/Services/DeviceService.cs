@@ -17,6 +17,13 @@ namespace IOTBackend.Application.Services
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
+        
+        public async Task<List<Device>> GetAll()
+        {
+            var deviceRepository = _unitOfWork.GetRepository<Device>();
+            var devices = await deviceRepository.GetAll().ToListAsync();
+            return devices;
+        }
 
         public async Task<List<Device>> GetDevicesOfUserAsync(Guid userId)
         {
@@ -57,7 +64,7 @@ namespace IOTBackend.Application.Services
             return response;
         }
 
-        public async Task<CommonActionResult<Device>> UpdateDeviceAsync(Device device)
+        public async Task<CommonActionResult<Device>> UpdateDeviceAsync(DeviceUpdateDto device)
         {
             var response = new CommonActionResult<Device>();
             var deviceRepository = _unitOfWork.GetRepository<Device>();

@@ -2,6 +2,7 @@
 
 using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
+using IOTBackend.Domain.Dtos;
 using IOTBackend.Infrastructure.Interfaces;
 using IOTBackend.Persistance;
 using IOTBackend.Shared.Enums;
@@ -17,6 +18,13 @@ namespace IOTBackend.Application.Services
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
+        
+        public async Task<List<ConnectionLine>> GetAll()
+        {
+            var connectionLineRepository = _unitOfWork.GetRepository<ConnectionLine>();
+            var connectionLines = connectionLineRepository.GetAll().ToList();
+            return connectionLines;
+        }
 
         public async Task<List<ConnectionLine>> GetConnectionLinesOfProjectAsync(Guid projectId)
         {
@@ -25,7 +33,7 @@ namespace IOTBackend.Application.Services
             return connectionLines;
         }
 
-        public async Task<ConnectionLine> GetConnectionLineAsync(Guid connectionLineId)
+        public async Task<ConnectionLine?> GetConnectionLineAsync(Guid connectionLineId)
         {
             var connectionLineRepository = _unitOfWork.GetRepository<ConnectionLine>();
             var connectionLine = await connectionLineRepository.GetAsync(connectionLineId);
@@ -47,12 +55,12 @@ namespace IOTBackend.Application.Services
             return response;
         }
 
-        public async Task<CommonActionResult<ConnectionLine>> UpdateConnectionLineAsync(ConnectionLine connectionLine)
+        public async Task<CommonActionResult<ConnectionLine>> UpdateConnectionLineAsync(Guid connectionId,ConnectionLineUpdateDto connectionLine)
         {
             var response = new CommonActionResult<ConnectionLine>();
             var connectionLineRepository = _unitOfWork.GetRepository<ConnectionLine>();
 
-            var existingConnectionLine = await connectionLineRepository.GetAsync(connectionLine.Id);
+            var existingConnectionLine = await connectionLineRepository.GetAsync(connectionId);
             if (existingConnectionLine == null)
             {
                 response.Status = ActionStatus.NotFound;
