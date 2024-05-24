@@ -17,8 +17,7 @@ namespace IOTBackend.Application.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
-
-
+        
         public AuthService(IMapper mapper, IUserService userService, IConfiguration configuration)
         {
             _mapper = mapper;
@@ -27,17 +26,9 @@ namespace IOTBackend.Application.Services
 
         }
 
-
         public async Task<ApiRequestResult<User>> Register(UserRegisterDto userRegisterDto)
         {
             var result = new ApiRequestResult<User>();
-
-            if (userRegisterDto == null)
-            {
-                result.Status = false;
-                result.Message = "Invalid Input";
-                return result;
-            }
 
             if (_userService.IsEmailExists(userRegisterDto.Email))
             {
@@ -70,11 +61,12 @@ namespace IOTBackend.Application.Services
 
             result.Status = true;
             result.Message = "User added successfully";
+            result.Data = addResult.Entity;
 
             return result;
         }
 
-        public async Task<User> Login(UserLoginDto userLoginDto)
+        public async Task<User?> Login(UserLoginDto userLoginDto)
         {
             var user = await _userService.GetUserAsync(userLoginDto.Username);
 
@@ -82,7 +74,6 @@ namespace IOTBackend.Application.Services
             {
                 return null;
             }
-
             return user;
         }
 
@@ -98,12 +89,12 @@ namespace IOTBackend.Application.Services
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var token = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds
+                signingCredentials: credentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -1,5 +1,7 @@
-﻿using IOTBackend.Application.Interfaces;
+﻿using AutoMapper;
+using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
+using IOTBackend.Domain.Dtos;
 using IOTBackend.Infrastructure.Interfaces;
 using IOTBackend.Persistance;
 using IOTBackend.Shared.Enums;
@@ -11,10 +13,19 @@ namespace IOTBackend.Application.Services
     public class ProjectService : IProjectService
     {
         private readonly IUnitOfWork<AppDbContext> _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ProjectService(IUnitOfWork<AppDbContext> unitOfWork)
+        public ProjectService(IUnitOfWork<AppDbContext> unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _mapper = mapper;
+        }
+        
+        public async Task<List<Project>> GetAll()
+        {
+            var projectRepository = _unitOfWork.GetRepository<Project>();
+            var projects = await projectRepository.GetAll().ToListAsync();
+            return projects;
         }
 
         public async Task<List<Project>> GetAllProjectsOfUserAsync(Guid userId)
@@ -31,40 +42,42 @@ namespace IOTBackend.Application.Services
             return project;
         }
 
-        public async Task<CommonActionResult<Project>> CreateProjectAsync(Project project)
+        public async Task<CommonActionResult<Project>> CreateProjectAsync(ProjectCreateDto project)
         {
             var response = new CommonActionResult<Project>();
             var projectRepository = _unitOfWork.GetRepository<Project>();
 
-            project.Id = new Guid();
-            var result = await projectRepository.AddAsync(project);
+            var newProject = _mapper.Map<Project>(project);
+            
+            newProject.Id = new Guid();
+            newProject.Created = DateTime.UtcNow;
+            var result = await projectRepository.AddAsync(newProject);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = project;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 
-        public async Task<CommonActionResult<Project>> UpdateProjectAsync(Project project)
+        public async Task<CommonActionResult<Project>> UpdateProjectAsync(Guid projectId, ProjectUpdateDto project)
         {
             var response = new CommonActionResult<Project>();
             var projectRepository = _unitOfWork.GetRepository<Project>();
 
-            var existingProject = await projectRepository.GetAsync(project.Id);
+            var existingProject = await projectRepository.GetAsync(projectId);
             if (existingProject == null)
             {
                 response.Status = ActionStatus.NotFound;
                 return response;
             }
-
-            // Update relevant properties
+            
             existingProject.Name = project.Name;
 
             var result = projectRepository.Update(existingProject);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingProject;
+            response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 

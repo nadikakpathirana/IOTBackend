@@ -17,6 +17,13 @@ namespace IOTBackend.Application.Services
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
+        
+        public async Task<List<Device>> GetAll()
+        {
+            var deviceRepository = _unitOfWork.GetRepository<Device>();
+            var devices = await deviceRepository.GetAll().ToListAsync();
+            return devices;
+        }
 
         public async Task<List<Device>> GetDevicesOfUserAsync(Guid userId)
         {
@@ -48,15 +55,16 @@ namespace IOTBackend.Application.Services
             var deviceRepository = _unitOfWork.GetRepository<Device>();
 
             device.Id = new Guid();
+            device.Created = DateTime.UtcNow;
             var result = await deviceRepository.AddAsync(device);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = device;
+            response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 
-        public async Task<CommonActionResult<Device>> UpdateDeviceAsync(Device device)
+        public async Task<CommonActionResult<Device>> UpdateDeviceAsync(DeviceUpdateDto device)
         {
             var response = new CommonActionResult<Device>();
             var deviceRepository = _unitOfWork.GetRepository<Device>();
@@ -74,8 +82,8 @@ namespace IOTBackend.Application.Services
             var result = deviceRepository.Update(existingDevice);
             _unitOfWork.Commit();
 
-            response.Status = result == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingDevice;
+            response.Status = result.Item1 == EntityState.Modified ? ActionStatus.Success : ActionStatus.Failed;
+            response.Entity = result.Item2;
             return response;
         }
 
@@ -95,7 +103,6 @@ namespace IOTBackend.Application.Services
             _unitOfWork.Commit();
 
             response.Status = result == EntityState.Deleted ? ActionStatus.Success : ActionStatus.Failed;
-            response.Entity = existingDevice;
             return response;
         }
 

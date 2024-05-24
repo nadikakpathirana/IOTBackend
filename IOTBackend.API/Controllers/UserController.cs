@@ -5,6 +5,7 @@ using IOTBackend.Shared.Enums;
 using IOTBackend.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using IOTBackend.Domain.Dtos;
 
 namespace IOTBackend.API.Controllers
 {
@@ -86,7 +87,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPut("{userId}")]
-        public async Task<ActionResult<ApiRequestResult<User>>> UpdateUser(Guid userId, User user)
+        public async Task<ActionResult<ApiRequestResult<User>>> UpdateUser(Guid userId, UserUpdateDto user)
         {
             var result = await _userService.UpdateUserAsync(userId, user);
 
@@ -104,7 +105,7 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "User updated successfully",
-                Data = user
+                Data = result.Entity
             };
 
             return Ok(response);

@@ -36,10 +36,10 @@ namespace IOTBackend.Infrastructure.Management
         }
 
 
-        public virtual async Task<EntityState> AddAsync(T entity)
+        public virtual async Task<(EntityState, T)> AddAsync(T entity)
         {
             var result = await this._dbSet.AddAsync(entity);
-            return result.State;
+            return (result.State, entity);
         }
 
 
@@ -56,7 +56,7 @@ namespace IOTBackend.Infrastructure.Management
         }
 
 
-        public async Task<T> GetAsync<TKey>(TKey id)
+        public async Task<T?> GetAsync<TKey>(TKey id)
         {
             return await this._dbSet.FindAsync(id);
         }
@@ -87,9 +87,9 @@ namespace IOTBackend.Infrastructure.Management
             return this._dbSet.Remove(entity).State;
         }
 
-        public virtual EntityState Update(T entity)
+        public virtual (EntityState, T) Update(T entity)
         {
-            return this._dbSet.Update(entity).State;
+            return (this._dbSet.Update(entity).State, entity);
         }
     }
 }

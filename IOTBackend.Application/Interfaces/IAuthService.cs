@@ -7,7 +7,7 @@ namespace IOTBackend.Application.Interfaces
     public interface IAuthService
     {
         Task<ApiRequestResult<User>> Register(UserRegisterDto userRegisterDto);
-        Task<User> Login(UserLoginDto userLoginDto);
+        Task<User?> Login(UserLoginDto userLoginDto);
         string GenerateToken(User user);
     }
 }

@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
+using IOTBackend.Domain.Dtos;
 using IOTBackend.Shared.Enums;
 using IOTBackend.Shared.Responses;
 
 namespace IOTBackend.API.Controllers
 {
     [ApiController]
-    [Route("api/connectionlines")]
+    [Route("api/connectionlines/")]
     public class ConnectionLineController : ControllerBase
     {
         private readonly IConnectionLineService _connectionLineService;
@@ -16,9 +17,24 @@ namespace IOTBackend.API.Controllers
         {
             _connectionLineService = connectionLineService;
         }
+        
+        [HttpGet]
+        public async Task<ActionResult<ApiRequestResult<List<ConnectionLine>>>> GetAllConnectionLines()
+        {
+            var connectionLines = await _connectionLineService.GetAll();
+
+            var response = new ApiRequestResult<List<ConnectionLine>>
+            {
+                Status = true,
+                Message = "Connection lines fetched successfully",
+                Data = connectionLines
+            };
+
+            return Ok(response);
+        }
 
         [HttpGet("project/{projectId}")]
-        public async Task<ActionResult<List<ConnectionLine>>> GetConnectionLinesOfProject(Guid projectId)
+        public async Task<ActionResult<ApiRequestResult<List<ConnectionLine>>>> GetConnectionLinesOfProject(Guid projectId)
         {
             var connectionLines = await _connectionLineService.GetConnectionLinesOfProjectAsync(projectId);
 
@@ -33,7 +49,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpGet("{connectionLineId}")]
-        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> GetConnectionLine(Guid connectionLineId)
+        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> Get(Guid connectionLineId)
         {
 
             var connectionLine = await _connectionLineService.GetConnectionLineAsync(connectionLineId);
@@ -58,9 +74,8 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> CreateConnectionLine(ConnectionLine connectionLine)
+        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> Create(ConnectionLine connectionLine)
         {
-
             var result = await _connectionLineService.CreateConnectionLineAsync(connectionLine);
 
             if (result.Status == ActionStatus.Error)
@@ -80,13 +95,13 @@ namespace IOTBackend.API.Controllers
                 Data = connectionLine
             };
 
-            return Created($"GetConnectionLine/{result.Entity.Id}", response);
+            return Created($"GetConnectionLine/{result?.Entity?.Id}", response);
         }
 
-        [HttpPut("{connectionLineId}")]
-        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> UpdateConnectionLine(Guid connectionLineId, ConnectionLine connectionLine)
+        [HttpPatch("{connectionLineId}")]
+        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> Update(Guid connectionLineId, ConnectionLineUpdateDto connectionLine)
         {
-            var result = await _connectionLineService.UpdateConnectionLineAsync(connectionLine);
+            var result = await _connectionLineService.UpdateConnectionLineAsync(connectionLineId, connectionLine);
 
             if (result.Status == ActionStatus.NotFound)
             {
@@ -112,14 +127,14 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Connection line updated successfully",
-                Data = connectionLine
+                Data = result.Entity
             };
 
             return Ok(response);
         }
 
         [HttpDelete("{connectionLineId}")]
-        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> DeleteConnectionLine(Guid connectionLineId)
+        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> Delete(Guid connectionLineId)
         {
             var result = await _connectionLineService.DeleteConnectionLineAsync(connectionLineId);
 
@@ -149,7 +164,6 @@ namespace IOTBackend.API.Controllers
                 Message = "Connection line deleted successfully",
                 Data = result.Entity
             };
-
 
             return Ok(response);
         }

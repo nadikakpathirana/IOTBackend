@@ -12,7 +12,7 @@ namespace IOTBackend.Application
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IAPIKeyService, APIKeyService>();
+            services.AddScoped<IAPIKeyService, ApiKeyService>();
             services.AddScoped<IConnectionLineService, ConnectionLineService>();
             services.AddScoped<IDeviceInstanceService, DeviceInstanceService>();
             services.AddScoped<IDeviceService, DeviceService>();

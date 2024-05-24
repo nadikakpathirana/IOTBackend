@@ -15,13 +15,13 @@ namespace IOTBackend.Infrastructure.Interfaces
 
         T AddEntity(T entity);
 
-        Task<EntityState> AddAsync(T entity);
+        Task<(EntityState, T)> AddAsync(T entity);
 
         Task<T> AddEntityAsync(T entity);
 
         T Get<TKey>(TKey id);
 
-        Task<T> GetAsync<TKey>(TKey id);
+        Task<T?> GetAsync<TKey>(TKey id);
 
         IQueryable<T> FindBy(Expression<Func<T, bool>> predicate);
 
@@ -33,6 +33,6 @@ namespace IOTBackend.Infrastructure.Interfaces
 
         EntityState Delete(T entity);
 
-        EntityState Update(T entity);
+        (EntityState, T) Update(T entity);
     }
 }
