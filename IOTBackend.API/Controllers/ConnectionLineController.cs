@@ -74,7 +74,7 @@ namespace IOTBackend.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> Create(ConnectionLine connectionLine)
+        public async Task<ActionResult<ApiRequestResult<ConnectionLine>>> Create(ConnectionLineCreateDto connectionLine)
         {
             var result = await _connectionLineService.CreateConnectionLineAsync(connectionLine);
 
@@ -92,7 +92,7 @@ namespace IOTBackend.API.Controllers
             {
                 Status = true,
                 Message = "Connection line created successfully",
-                Data = connectionLine
+                Data = result.Entity
             };
 
             return Created($"GetConnectionLine/{result?.Entity?.Id}", response);

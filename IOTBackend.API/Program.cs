@@ -75,12 +75,26 @@ app.Map("/ws", builder =>
     {
         if (context.WebSockets.IsWebSocketRequest)
         {
-            // Resolve IWebSocketService from the service provider
             var webSocketService = app.Services.GetRequiredService<IWebSocketService>();
-
             var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+            
             var controller = new WebSocketController(webSocket, webSocketService);
-            await controller.HandleWebSocket();
+            
+            string type = context.Request.Query["type"].ToString();
+            Guid userId = new Guid(context.Request.Query["userId"].ToString());
+            
+            if (type != "ui")
+            {
+                Guid deviceId = new Guid(context.Request.Query["deviceId"].ToString());
+                Guid apiKey = new Guid(context.Request.Query["apiKey"].ToString());
+                
+                await controller.HandleWebSocket(type, deviceId, apiKey, userId);
+            }
+            else
+            {
+                await controller.HandleWebSocket(type, userId, userId, userId);
+            }
+            await next();
         }
         else
         {

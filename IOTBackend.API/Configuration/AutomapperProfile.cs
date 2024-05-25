@@ -16,6 +16,7 @@ namespace IOTBackend.API.Configuration
             CreateMap<ApiKeyAddDto, ApiKey>();
             CreateMap<ApiKeyUpdateDto, ApiKey>();
 
+            CreateMap<ConnectionLineCreateDto, ConnectionLine>();
             CreateMap<ConnectionLineUpdateDto, ConnectionLine>();
             
             CreateMap<ProjectCreateDto, Project>();
