@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 using IOTBackend.Application.Interfaces;
 using IOTBackend.Domain.DbEntities;
@@ -13,10 +14,12 @@ namespace IOTBackend.Application.Services
     public class ConnectionLineService : IConnectionLineService
     {
         private readonly IUnitOfWork<AppDbContext> _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ConnectionLineService(IUnitOfWork<AppDbContext> unitOfWork)
+        public ConnectionLineService(IUnitOfWork<AppDbContext> unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _mapper = mapper;
         }
         
         public async Task<List<ConnectionLine>> GetAll()
@@ -32,6 +35,13 @@ namespace IOTBackend.Application.Services
             var connectionLines = await connectionLineRepository.FindByAsync(cl => cl.ProjectId == projectId);
             return connectionLines;
         }
+        
+        public async Task<List<ConnectionLine>> GetConnectionLinesOfDevicesBeginWith(Guid deviceId)
+        {
+            var connectionLineRepository = _unitOfWork.GetRepository<ConnectionLine>();
+            var connectionLines = await connectionLineRepository.FindByAsync(cl => cl.FromDevice == deviceId);
+            return connectionLines;
+        }
 
         public async Task<ConnectionLine?> GetConnectionLineAsync(Guid connectionLineId)
         {
@@ -40,13 +50,16 @@ namespace IOTBackend.Application.Services
             return connectionLine;
         }
 
-        public async Task<CommonActionResult<ConnectionLine>> CreateConnectionLineAsync(ConnectionLine connectionLine)
+        public async Task<CommonActionResult<ConnectionLine>> CreateConnectionLineAsync(ConnectionLineCreateDto connectionLine)
         {
             var response = new CommonActionResult<ConnectionLine>();
             var connectionLineRepository = _unitOfWork.GetRepository<ConnectionLine>();
 
-            connectionLine.Id = new Guid();
-            var result = await connectionLineRepository.AddAsync(connectionLine);
+            var newConnectionLine = _mapper.Map<ConnectionLine>(connectionLine);
+
+            newConnectionLine.Id = new Guid();
+            newConnectionLine.Created = DateTime.UtcNow;
+            var result = await connectionLineRepository.AddAsync(newConnectionLine);
             _unitOfWork.Commit();
 
             response.Status = result.Item1 == EntityState.Added ? ActionStatus.Success : ActionStatus.Failed;
