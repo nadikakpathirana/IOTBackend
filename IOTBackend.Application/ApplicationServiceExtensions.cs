@@ -20,6 +20,7 @@ namespace IOTBackend.Application
 
             // singleton service
             services.AddSingleton<IWebSocketService, WebSocketService>();
+            services.AddSingleton<ILogicProcessorService, LogicProcessorService>();
         }
     }
 }

@@ -13,6 +13,7 @@ namespace IOTBackend.Application.Services
     public class WebSocketService : IWebSocketService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogicProcessorService _logicProcessorService;
         
         private readonly ConcurrentDictionary<Guid, WebSocket> _connectedSensors = new ();
         private readonly ConcurrentDictionary<Guid, WebSocket> _connectedOutputs = new ();
@@ -21,9 +22,10 @@ namespace IOTBackend.Application.Services
         private ConcurrentDictionary<Guid, string> _type = new ();
 
 
-        public WebSocketService(IServiceProvider serviceProvider)
+        public WebSocketService(IServiceProvider serviceProvider, ILogicProcessorService logicProcessorService)
         {
             _serviceProvider = serviceProvider;
+            _logicProcessorService = logicProcessorService;
         }
         
         public void AddClient(string type, Guid deviceId, WebSocket webSocket)
@@ -136,15 +138,18 @@ namespace IOTBackend.Application.Services
                 List<Guid> validDeviceInstanceIds = new List<Guid>();
                 foreach (var validConnectionLine in validConnectionLines)
                 {
-                    validDeviceInstanceIds.TryAdd(validConnectionLine.ToDevice);
+                    if (validConnectionLine.Condition == null && await _logicProcessorService.Process(sensorData.Value, validConnectionLine.Condition))
+                    {
+                        validDeviceInstanceIds.TryAdd(validConnectionLine.ToDevice);
+                    }
                 }
                 
                 // define messages for Uis and Output Devices
                 
-            
-                // transmit the message in to them
+                // define messages for Output Devices and Output Devices
                 
             
+                // transmit the message in to them
                 
                 var transmitToOutputsTask = TransmitToOutputs("Ring Weyaan", validDeviceInstanceIds);
                 var transmitToUisTask = TransmitToUis("UI eke pennapaan");

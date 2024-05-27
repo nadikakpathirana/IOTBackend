@@ -2,9 +2,8 @@
 {
     public class SensorDataDto
     {
-        public dynamic Value { get; set; }
+        public int Value { get; set; }
 
-        public string ValueType { get; set; }
 
         public Guid APIKey { get; set; }
 
