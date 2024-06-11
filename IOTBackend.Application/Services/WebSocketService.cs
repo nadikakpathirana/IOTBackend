@@ -1,12 +1,16 @@
-﻿using IOTBackend.Application.Interfaces;
+﻿
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
-using AutoMapper.Internal;
-using IOTBackend.Domain.DbEntities;
-using IOTBackend.Domain.Dtos;
+
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+
+using IOTBackend.Application.Interfaces;
+using IOTBackend.Application.Services.Interfaces;
+using IOTBackend.Domain.DbEntities;
+using IOTBackend.Domain.Dtos;
+
 
 namespace IOTBackend.Application.Services
 {
@@ -117,44 +121,82 @@ namespace IOTBackend.Application.Services
 
             if (sensorData != null)
             {
+                string json = @"{
+                  'dd9f50f8-9efc-4a55-af74-514014c28a9b': {
+                    '0': [
+                      {
+                        '0': 'val',
+                        '1': '=',
+                        '2': '10',
+                        '11': {
+                          '0': [
+                            '2d875c70-a1d5-400e-834b-561fe8e12613'
+                          ]
+                        }
+                      },
+                      {
+                        '0': 'val',
+                        '1': '>',
+                        '2': '50',
+                        '10': [
+                          {
+                            '0': 'val',
+                            '1': '>',
+                            '2': '60',
+                            '11': {
+                              '0': [
+                                '6ab7f049-a905-4374-9370-5cd6d24bd3b6'
+                              ]
+                            }
+                          }
+                        ],
+                        '11': {
+                            '0': [
+                                '6ab7f049-a905-4374-9370-5cd6d24bd3b7'
+                             ]
+                        }
+                      }
+                    ]
+                  }
+                }";
                 
-                // should get all connections line including above id as fromDevice
-                var connectionLines = await GetConnectionLines(sensorData.DeviceId);
-            
-                // check walid connection lines
-                List<ConnectionLine> validConnectionLines = new List<ConnectionLine>();
-            
-                // get ToDevices of the valid connectioon lines
-                foreach (var connectionLine in connectionLines)
+                using var scope = _serviceProvider.CreateScope();
+                var awsConnectionService = scope.ServiceProvider.GetRequiredService<IAwsConnectionService>();
+
+                var connectionList = await awsConnectionService.GetAll();
+
+                var connection = connectionList.First(c => c.Id == sensorData.DeviceId);
+                
+                var devicesWithPins = _logicProcessorService.GetDevicesWithPins(connection.Data, sensorData);
+                
+                Console.WriteLine(JsonConvert.SerializeObject(devicesWithPins, Formatting.Indented));
+                
+                foreach (var pins  in devicesWithPins)
                 {
-                    if (true)
+                    foreach (var deviceId in pins.Value)
                     {
-                        validConnectionLines.Add(connectionLine);
+                        var hasConnected = _connectedOutputs.ContainsKey(new Guid(deviceId));
+
+                        if (hasConnected)
+                        {
+                            var client = _connectedOutputs[new Guid(deviceId)];
+                    
+                            if (client.State == WebSocketState.Open)
+                            {
+                                var message = new OutputObject("test");
+
+                                // Serialize the object to a JSON string
+                                string jsonString = JsonConvert.SerializeObject(message);
+
+                                // Convert the JSON string to bytes
+                                byte[] bytesToSend = Encoding.UTF8.GetBytes(jsonString);
+
+                                // Send the bytes using WebSocket
+                                await client.SendAsync(new ArraySegment<byte>(bytesToSend), WebSocketMessageType.Text, true, default);
+                            }
+                        }
                     }
                 }
-                
-                // get output devices of the valid connection lines
-                
-                List<Guid> validDeviceInstanceIds = new List<Guid>();
-                foreach (var validConnectionLine in validConnectionLines)
-                {
-                    if (validConnectionLine.Condition == null && await _logicProcessorService.Process(sensorData.Value, validConnectionLine.Condition))
-                    {
-                        validDeviceInstanceIds.TryAdd(validConnectionLine.ToDevice);
-                    }
-                }
-                
-                // define messages for Uis and Output Devices
-                
-                // define messages for Output Devices and Output Devices
-                
-            
-                // transmit the message in to them
-                
-                var transmitToOutputsTask = TransmitToOutputs("Ring Weyaan", validDeviceInstanceIds);
-                var transmitToUisTask = TransmitToUis("UI eke pennapaan");
-            
-                await Task.WhenAll(transmitToUisTask, transmitToOutputsTask);
             }
         }
 
@@ -189,5 +231,15 @@ namespace IOTBackend.Application.Services
             return await connectionLineService.GetConnectionLinesOfDevicesBeginWith(deviceId);
         }
         
+    }
+
+    public class OutputObject
+    {
+        private string _msg { get; set; }
+
+        public OutputObject(string msg)
+        {
+            _msg = msg;
+        }
     }
 }

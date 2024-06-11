@@ -25,4 +25,8 @@
     <ProjectReference Include="..\IOTBackend.Infrastructure\IOTBackend.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Services\AwsServices\PostgresDbService.cs" />
+  </ItemGroup>
+
 </Project>

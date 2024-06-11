@@ -7,6 +7,6 @@
 
         public Guid APIKey { get; set; }
 
-        public Guid DeviceId { get; set; }
+        public string DeviceId { get; set; }
     }
 }

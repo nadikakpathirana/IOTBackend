@@ -20,7 +20,26 @@ namespace IOTBackend.Persistance
                     try
                     {
                         options.UseNpgsql(
-                            configuration.GetConnectionString("AppDbConnection"),
+                            configuration.GetConnectionString("AppDbContext"),
+                            b => b.MigrationsAssembly("IOTBackend.API")
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error while connecting to DB");
+                        Console.WriteLine(ex);
+                    }
+                }
+
+            });
+            
+            services.AddDbContext<AwsDbContext>(options =>
+            {
+                {
+                    try
+                    {
+                        options.UseNpgsql(
+                            configuration.GetConnectionString("AwsDbConnection"),
                             b => b.MigrationsAssembly("IOTBackend.API")
                         );
                     }

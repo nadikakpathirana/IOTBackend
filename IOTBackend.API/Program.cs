@@ -109,7 +109,7 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-Console.WriteLine(builder.Configuration.GetConnectionString("AppDbConnection"));
+Console.WriteLine(builder.Configuration.GetConnectionString("AppDbContext"));
 
 app.MapControllers();
 

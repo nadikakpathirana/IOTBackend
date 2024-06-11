@@ -18,4 +18,8 @@
     <ProjectReference Include="..\IOTBackend.Shared\IOTBackend.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DbEntities\AwsEntities\" />
+  </ItemGroup>
+
 </Project>

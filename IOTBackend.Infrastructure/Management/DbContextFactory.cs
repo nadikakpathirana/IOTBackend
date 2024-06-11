@@ -18,6 +18,10 @@ namespace IOTBackend.Infrastructure.Management
             if (typeof(TContext) == typeof(AppDbContext))
             {
                 return (TContext)Activator.CreateInstance(typeof(TContext), new object[] { connectionString });
+            } 
+            else if(typeof(TContext) == typeof(AwsDbContext))
+            {
+                return (TContext)Activator.CreateInstance(typeof(TContext), new object[] { connectionString });
             }
             else
             {

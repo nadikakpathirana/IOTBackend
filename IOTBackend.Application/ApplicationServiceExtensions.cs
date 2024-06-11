@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using IOTBackend.Application.Interfaces;
 using IOTBackend.Application.Services;
+using IOTBackend.Application.Services.Interfaces;
 
 namespace IOTBackend.Application
 {
@@ -17,6 +18,7 @@ namespace IOTBackend.Application
             services.AddScoped<IDeviceInstanceService, DeviceInstanceService>();
             services.AddScoped<IDeviceService, DeviceService>();
             services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<IAwsConnectionService, AwsConnectionService>();
 
             // singleton service
             services.AddSingleton<IWebSocketService, WebSocketService>();

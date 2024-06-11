@@ -14,7 +14,7 @@ namespace IOTBackend.Infrastructure.Management
         public UnitOfWork(IConfiguration configuration)
         {
             _configuration = configuration;
-            _dbContext = DbContextFactory.CreateDbContext<TContext>(_configuration.GetConnectionString("AppDbConnection"));
+            _dbContext = DbContextFactory.CreateDbContext<TContext>(_configuration.GetConnectionString(typeof(TContext).Name));
             try
             {
                 _dbContext.Database.OpenConnection();
